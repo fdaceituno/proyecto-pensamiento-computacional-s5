@@ -24,6 +24,7 @@ let finY
 let procesoDrag=0
 
 let contadorClicks=0
+let listoParaVolver=false
 
 //ahora para cargar las imágenes
 function preload(){
@@ -97,6 +98,8 @@ function draw() {
         if(frameActual>3){
           escena=3;
           frameActual=0
+          listoParaVolver=false
+          arrastrando=false
         }
        }
      }
@@ -114,93 +117,122 @@ function draw() {
     }
 }
   //en la escena 1 quiero que los frames vayan avanzanzando por medio de 1 click
-function mousePressed(){
-  
-  if(escena==1){
-contadorClicks++
-    if(contadorClicks==1){
-      frameActual=1
-    }
-      else if(contadorClicks==2){
-      frameActual=0
-    }
-    else if(contadorClicks==3){
-      frameActual=1
-    }
-      else if(contadorClicks==4){
-      frameActual=2
-    }
-    else if(contadorClicks==5){
-      frameActual=3
-    }
-    else if(contadorClicks==6){
-      frameActual=2
-    }
-    else if(contadorClicks==7){
-      frameActual=3
-    }
-    else{
-      escena=2
-      frameActual=0
-      contadorClicks=0
-      empiezoCirculo=false
-    }
-    
-  //ahora cada frame deberia de avanzar con 1 click
+  function mousePressed(){
 
-  if(frameActual>3){
-    escena=2
-    frameActual=0
-    empiezoCirculo=false
-    //con esto cuando termina el frame 3, automaticamente aparece la escena 2
-  }
-  }
-    if(escena==3){
-console.log("CLICK EN ESCENA 3")
-      
-      let centroX=width/2
-      let centroY=height/2
+// -------- ESCENA 1 --------
+if(escena==1){
 
-console.log(dist(mouseX, mouseY, centroX,centroY))
-      if(dist(mouseX,mouseY,centroX,centroY)<150){
-        arrastrando=true
-        console.log("EMPIEZA ARRASTRE")
-        inicioX=mouseX
-        inicioY=mouseY
-      
-  }}
-      }
+contadorClicks++;
+
+if(contadorClicks==1){
+frameActual=1;
+}
+else if(contadorClicks==2){
+frameActual=0;
+}
+else if(contadorClicks==3){
+frameActual=1;
+}
+else if(contadorClicks==4){
+frameActual=2;
+}
+else if(contadorClicks==5){
+frameActual=3;
+}
+else if(contadorClicks==6){
+frameActual=2;
+}
+else if(contadorClicks==7){
+frameActual=3;
+}
+else{
+escena=2;
+frameActual=0;
+contadorClicks=0;
+empiezoCirculo=false;
+}
+
+return;
+}
+
+// -------- ESCENA 3 --------
+if(escena==3){
+
+// Si ya terminó la animación, comienza el segundo arrastre
+if(listoParaVolver){
+arrastrando=true;
+inicioX=mouseX;
+inicioY=mouseY;
+return;
+}
+
+let centroX=width/2;
+let centroY=height/2;
+
+if(dist(mouseX,mouseY,centroX,centroY)<150){
+arrastrando=true;
+inicioX=mouseX;
+inicioY=mouseY;
+}
+}
+}
+
   function mouseReleased(){
-  if(escena==3){
     arrastrando=false
-   
-    
-    }
   }
 function mouseDragged(){
-  if(escena==3 && arrastrando){
-    let dx=mouseX-inicioX
-    let dy=mouseX-inicioY
 
-    let distancia=sqrt(dx*dx+dy*dy)
-    if(distancia<100){
-      frameActual=0
-  }
-    else if(distancia<200){
-      frameActual=2
-    }
-    else if(distancia<300){
-      frameActual=3
-    }
-    else if(distancia<400){
-      frameActual=3
-    }
-    else if(distancia<450){
-      frameActual=4
-    }
-    else{
-      frameActual=5
-    }
+if(escena!=3 || !arrastrando){
+return;
+}
+
+let dx=mouseX-inicioX;
+let dy=mouseY-inicioY;
+
+// SEGUNDO ARRASTRE (volver a escena 1)
+if(listoParaVolver){
+
+if(dx<-200){
+
+escena=1;
+frameActual=0;
+contadorClicks=0;
+
+listoParaVolver=false;
+arrastrando=false;
+empiezoCirculo=false;
+}
+
+return;
+}
+
+// PRIMER ARRASTRE (animación)
+let distancia=sqrt(dx*dx+dy*dy);
+
+if(distancia<100){
+frameActual=0;
+}
+else if(distancia<200){
+frameActual=1;
+}
+else if(distancia<250){
+frameActual=2;
+}
+else if(distancia<300){
+frameActual=3;
+}
+else if(distancia<350){
+frameActual=4;
+}
+else{
+
+frameActual=5;
+
+listoParaVolver=true;
+
+// Guardamos este punto para medir el arrastre hacia la izquierda
+inicioX=mouseX;
+inicioY=mouseY;
 }
 
 }
