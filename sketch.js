@@ -1,30 +1,31 @@
 //aquí pondré las variables
 
-//escena actual
+//escena actual/para guaradr qué escena está en el programa 
 let escena=1;
-//frame actual
+//frame actual/para indicar que imagen mostrat dentro de la escena actual
 let frameActual=0
 
-//ahora crearé los ARREGLOS para guardar 4 frames en cada escena
+//ahora crearé los ARREGLOS para guardar 4 frames en cada escena (y 6 en la última)
 let escena1=[];
 let escena2=[];
 let escena3=[];
 
+//para detertar cuando el usuario hace un mov circular(en la escena2)
 let anguloAnterior=0
 let acumuladorCircular=0
-
 let empiezoCirculo=false
 
+//para guardar donde comenzó el arrastre
+//saber si el usuario está arrastrando
+//saber si ya terminó la escena y volver a la 1
 let inicioX;
 let inicioY;
 let arrastrando=false;
-let finX
-let finY
-
-let procesoDrag=0
-
-let contadorClicks=0
 let listoParaVolver=false
+
+//para contar los clicspara cambiar de frame
+let contadorClicks=0
+
 
 //ahora para cargar las imágenes
 function preload(){
@@ -44,7 +45,7 @@ function preload(){
   escena3[3]=loadImage("escena3_3.png")
   escena3[4]=loadImage("escena3_4.png")
   escena3[5]=loadImage("escena3_5.png")
-  //ej de escena1[i]=loadImage("assents/escena1_"+i+".png")
+  //ej de escena1[i]=loadImage("escena1_"i".png")
   //aquí cuando i vale 0, carga escena1_0.png
   //y asi mismo con las demás
 }
@@ -52,6 +53,7 @@ function preload(){
 function setup() {
   createCanvas(windowWidth, windowHeight);
   //para que el canvas ocupe toda la pantalla, sin determinar medidas específicas
+  //para comprobar que las imágenes cargan(pq no me estaba funcionando)
   console.log(escena1)
 }
 
@@ -79,22 +81,28 @@ function draw() {
     text("Cocina la ratatouille",width/2, height-50)
     textSize(16)
     text("Revuelve con el mouse", width/2, height-30)
+     //para comenzar mov
      if(mouseIsPressed){
        empiezoCirculo=true
      }
      if(empiezoCirculo){
+       //para calcular el ángulo del mouse respecto al centro
        let angulo=atan2(
          mouseY-height/2,
          mouseX-width/2
        );
+       //calcular cuanto giró el mouse
        let diferencia=abs(angulo-anguloAnterior);
+       //para sumar el mov circular
        acumuladorCircular+=diferencia
        anguloAnterior=angulo;
 
+       //al llegar acá cambia de frame
        if(acumuladorCircular>1.5){
          acumuladorCircular=0;
          frameActual++;
-
+         
+       //y cuando termina pasa a la escena 3
         if(frameActual>3){
           escena=3;
           frameActual=0
@@ -119,7 +127,7 @@ function draw() {
   //en la escena 1 quiero que los frames vayan avanzanzando por medio de 1 click
   function mousePressed(){
 
-// -------- ESCENA 1 --------
+// ESCENA 1 
 if(escena==1){
 
 contadorClicks++;
@@ -155,7 +163,7 @@ empiezoCirculo=false;
 return;
 }
 
-// -------- ESCENA 3 --------
+// ESCENA 3 
 if(escena==3){
 
 // Si ya terminó la animación, comienza el segundo arrastre
@@ -177,11 +185,16 @@ inicioY=mouseY;
 }
 }
 
+//para indicar que el arrastre terminó
   function mouseReleased(){
+    //arrastrando=true indica que el usuario está arrastrando el mouse
+    //mientras mueve el mouse con el botón presionado, mouseDragged cambia los frames
+    //cuando suelta el mouse entra en mouseReleased
     arrastrando=false
+    //es decir, el usuario dejó de arrastrar
   }
 function mouseDragged(){
-
+//para avanzar frames con arrastre diagonal
 if(escena!=3 || !arrastrando){
 return;
 }
@@ -190,6 +203,9 @@ let dx=mouseX-inicioX;
 let dy=mouseY-inicioY;
 
 // SEGUNDO ARRASTRE (volver a escena 1)
+  //comprobar q ya terminó la escena
+  //medir cuanto arrastró hacia la izq
+  //si supera 200 pixeles
 if(listoParaVolver){
 
 if(dx<-200){
@@ -208,6 +224,9 @@ return;
 
 // PRIMER ARRASTRE (animación)
 let distancia=sqrt(dx*dx+dy*dy);
+  //eso cualcula cuanto se movió el mouse
+
+  //mientra más se arrastra más avanzan los frames
 
 if(distancia<100){
 frameActual=0;
